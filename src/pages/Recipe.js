@@ -8,10 +8,12 @@ function Recipe() {
 
     let params = useParams(); 
     const [details, setDetails] = useState({})
+    const [active, setActive] = useState("instructions")
 
     const fetchDetails = async() => { 
       const data = await fetch(`https://api.spoonacular.com/recipes/${params.id}/information?apiKey=${apiKey}`)
       const detailData = await data.json(); 
+      
       setDetails(detailData);
     };
     
@@ -21,18 +23,32 @@ function Recipe() {
    
 
   return (
-    <div>
+    
      <DetailWrapper>
       <div>
         <h2>{details.title}</h2>
         <img src={details.image} />
       </div>
-    </DetailWrapper> 
     <Info>
-      <Button>Instructions</Button>
-    </Info>
+      <Button className={active === 'instructions' ? "active" : ""} onClick={() => setActive('instructions')}>Instructions</Button>
+      <Button className={active === 'ingredients' ? "active" : ""} onClick={() => setActive('ingredients')}>ingredients</Button>
+    {active === 'instructions' && ( <div>
+      <h3 dangerouslySetInnerHTML={{ __html: details.summary}}></h3>
+      <h3 dangerouslySetInnerHTML={{ __html: details.instructions}}></h3>
     </div>
-  )
+    )}
+    {active === 'ingredients' && (
+      <ul>
+     {details.extendedIngredients.map((ingredient) => (
+       <li key={ingredient.id}>{ingredient.original}</li>
+     ))}
+    </ul>
+    )}
+    
+   
+    </Info>
+    </DetailWrapper> 
+  );
 }
 
 const DetailWrapper = styled.div` 
